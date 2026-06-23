@@ -26,6 +26,16 @@ TARGET_LEAGUES = [
     {"name": "MLS", "country": "USA", "api_id": 253},
     {"name": "Eredivisie", "country": "Netherlands", "api_id": 88},
     {"name": "Primeira Liga", "country": "Portugal", "api_id": 94},
+    {"name": "World Cup", "country": "International", "api_id": 1},
+    {"name": "Champions League", "country": "Europe", "api_id": 2},
+    {"name": "Europa League", "country": "Europe", "api_id": 3},
+    {"name": "Copa America", "country": "South America", "api_id": 9},
+    {"name": "Copa do Brasil", "country": "Brazil", "api_id": 73},
+    {"name": "Série B", "country": "Brazil", "api_id": 72},
+    {"name": "Liga Portugal", "country": "Portugal", "api_id": 94},
+    {"name": "Championship", "country": "England", "api_id": 40},
+    {"name": "Liga MX", "country": "Mexico", "api_id": 262},
+    {"name": "J-League", "country": "Japan", "api_id": 98},
 ]
 
 
