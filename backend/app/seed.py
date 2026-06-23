@@ -127,11 +127,11 @@ def generate_stats(base_shots: float, base_sot: float, consistency: float, n_gam
 
 async def seed_database(session):
     """Seed using an existing session (called from API endpoint)."""
-    # Clear existing data
-    for table in [PlayerMatchStats, ExpectedLineup, Odds, ValueBet, PlayerForm, Match, Player, Team, League]:
-        await session.execute(table.__table__.delete())
-    await session.commit()
-    print("Cleared existing data.")
+    # Drop and recreate all tables
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+    print("Recreated all tables.")
 
     league_map = {}
     team_map = {}
