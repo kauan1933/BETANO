@@ -87,9 +87,6 @@ async def get_admin_dashboard(db: AsyncSession = Depends(get_db)) -> dict:
 async def run_seed():
     """Drop all tables, recreate, and populate with mock data for testing."""
     try:
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
-            await conn.run_sync(Base.metadata.create_all)
         await seed_database()
         return {"message": "Database seeded successfully"}
     except Exception as e:
