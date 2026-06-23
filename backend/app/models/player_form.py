@@ -13,4 +13,4 @@ class PlayerForm(Base):
     avg_shots_on_target = Column(Float, default=0.0)
     avg_minutes_played = Column(Float, default=0.0)
     consistency_score = Column(Float, default=0.0)
-    last_updated = Column(DateTime(timezone=True), server_default=func.now())
+    last_updated = Column(DateTime, server_default=func.now())

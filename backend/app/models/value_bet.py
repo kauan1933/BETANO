@@ -24,4 +24,4 @@ class ValueBet(Base):
     expected_value = Column(Float, nullable=False)
     confidence = Column(String(20), nullable=True)
     status = Column(SAEnum(BetStatus), default=BetStatus.ACTIVE)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime, server_default=func.now())

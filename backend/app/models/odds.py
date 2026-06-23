@@ -13,4 +13,4 @@ class Odds(Base):
     player_id = Column(Integer, ForeignKey("players.id"), nullable=True)
     selection = Column(String(200), nullable=False)
     odds_value = Column(Float, nullable=False)
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())

@@ -6,8 +6,8 @@ class Settings(BaseSettings):
     APP_NAME: str = "ShotSaaS"
     DEBUG: bool = False
 
-    DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/shotsaas"
-    DATABASE_URL_SYNC: str = "postgresql+psycopg://postgres:postgres@localhost:5432/shotsaas"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./shotsaas.db"
+    DATABASE_URL_SYNC: str = "sqlite:///./shotsaas.db"
 
     REDIS_URL: str = "redis://localhost:6379/0"
 
