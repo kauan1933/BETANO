@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: shotsaas-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: shotsaas-db
+          property: connectionString
+      - key: DATABASE_URL_SYNC
+        fromDatabase:
+          name: shotsaas-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: shotsaas-redis
+          property: connectionString
+      - key: API_FOOTBALL_KEY
+        sync: false
+      - key: DEBUG
+        value: "false"
+
+databases:
+  - name: shotsaas-db
+    plan: free
+    databaseName: shotsaas
+    region: oregon
+
+redis:
+  - name: shotsaas-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+    region: oregon
