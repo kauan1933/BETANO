@@ -90,7 +90,6 @@ async def health():
 
 # WebSocket endpoint for real-time updates
 from fastapi import WebSocket, WebSocketDisconnect
-from typing import set
 
 
 class ConnectionManager:
