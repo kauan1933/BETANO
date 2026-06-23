@@ -125,14 +125,17 @@ def generate_stats(base_shots: float, base_sot: float, consistency: float, n_gam
     return stats
 
 
-async def seed_database(session):
-    """Seed using an existing session (called from API endpoint)."""
-    # Drop and recreate all tables
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
-    print("Recreated all tables.")
+async def seed_database(session=None):
+    """Seed using an existing session or create a new one."""
+    if session:
+        await _seed_inner(session)
+    else:
+        async with async_session_factory() as sess:
+            await _seed_inner(sess)
+            await sess.commit()
 
+
+async def _seed_inner(session):
     league_map = {}
     team_map = {}
 
@@ -148,32 +151,26 @@ async def seed_database(session):
             await session.flush()
             team_map[team_name] = team
 
-    player_counts = {"Shooter": 0, "Midfielder": 0, "Defender": 0}
     player_map = {}
 
     for team_name, team in team_map.items():
-        league_name = next(k for k, v in league_map.items() if v.id == team.league_id)
-        is_top = league_name in ["Premier League", "La Liga"]
         for template in SHOOTER_TEMPLATES:
             player = Player(name=template["name"], team_id=team.id,
                           position="Forward", nationality=template.get("nationality", "Unknown"))
             session.add(player)
             await session.flush()
             player_map[(team_name, player.name)] = player
-            player_counts["Shooter"] += 1
         for template in MID_TEMPLATES[:3]:
             player = Player(name=template["name"], team_id=team.id,
                           position="Midfielder", nationality="Various")
             session.add(player)
             await session.flush()
             player_map[(team_name, player.name)] = player
-            player_counts["Midfielder"] += 1
 
     today = date.today()
-    match_id_counter = 1
     for league_name, league in league_map.items():
         teams_in_league = [t for t_name, t in team_map.items()
-                          if any(k == league_name for k, v in league_map.items() if v.id == t.league_id)]
+                          if t.league_id == league.id]
         random.shuffle(teams_in_league)
         for i in range(0, len(teams_in_league) - 1, 2):
             home = teams_in_league[i]
@@ -183,41 +180,31 @@ async def seed_database(session):
                          status="scheduled")
             session.add(match)
             await session.flush()
-            for team, side in [(home, "home"), (away, "away")]:
-                for (pkey, pname), player in player_map.items():
-                    if pkey == team.name:
-                        lineup = ExpectedLineup(match_id=match.id, team_id=team.id,
-                                              player_id=player.id, is_probable=True)
-                        session.add(lineup)
-                        stats = generate_stats(3.5, 1.8, 0.75, n_games=10)
-                        for s in stats:
-                            pms = PlayerMatchStats(player_id=player.id, match_id=match.id,
-                                                minutes_played=s["minutes_played"],
-                                                total_shots=s["total_shots"],
-                                                shots_on_target=s["shots_on_target"],
-                                                goals=s["goals"], assists=s["assists"])
-                            session.add(pms)
 
-            # Odds
+            for team in [home, away]:
+                for (pkey, _), player in player_map.items():
+                    if pkey == team.name:
+                        session.add(ExpectedLineup(
+                            match_id=match.id, team_id=team.id,
+                            player_id=player.id, is_probable=True))
+                        for s in generate_stats(3.5, 1.8, 0.75, n_games=10):
+                            session.add(PlayerMatchStats(
+                                player_id=player.id, match_id=match.id, **s))
+
             bookmaker = "Betano"
             for (pkey, pname), player in player_map.items():
                 if pkey == home.name or pkey == away.name:
-                    avg_sot = sum(
-                        g["shots_on_target"] for g in
-                        generate_stats(3.5, 1.8, 0.75, n_games=10)
-                    ) / 10
+                    avg_sot = round(sum(g["shots_on_target"] for g in
+                        generate_stats(3.5, 1.8, 0.75, n_games=10)) / 10, 2)
                     prob_1 = round(1 - math.exp(-avg_sot), 2)
                     prob_2 = round(1 - math.exp(-avg_sot) - avg_sot * math.exp(-avg_sot), 2)
                     for label, prob in [("Player Shots on Target", prob_1),
                                        ("Player Shots on Target 2+", prob_2)]:
                         fair_odds = round(1.0 / prob, 2) if prob > 0 else 10.0
-                        market_odds = round(fair_odds * random.uniform(0.85, 1.10), 2)
-                        odds = Odds(match_id=match.id, bookmaker=bookmaker,
-                                  market=f"{label} (Player Props)", player_id=player.id,
-                                  selection=pname.split()[-1], odds_value=market_odds)
-                        session.add(odds)
-            match_id_counter += 1
-
+                        session.add(Odds(match_id=match.id, bookmaker=bookmaker,
+                            market=f"{label} (Player Props)", player_id=player.id,
+                            selection=pname.split()[-1],
+                            odds_value=round(fair_odds * random.uniform(0.85, 1.10), 2)))
     await session.commit()
 
 

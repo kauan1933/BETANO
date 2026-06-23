@@ -21,6 +21,8 @@ from app.tasks.refresh import (
     detect_value_bets,
 )
 from app.seed import seed_database
+from app.models.base import Base
+from app.core.database import engine
 
 router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
 
@@ -82,10 +84,13 @@ async def get_admin_dashboard(db: AsyncSession = Depends(get_db)) -> dict:
 
 
 @router.post("/seed")
-async def run_seed(db: AsyncSession = Depends(get_db)):
-    """Populate database with mock data for testing."""
+async def run_seed():
+    """Drop all tables, recreate, and populate with mock data for testing."""
     try:
-        await seed_database(db)
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
+            await conn.run_sync(Base.metadata.create_all)
+        await seed_database()
         return {"message": "Database seeded successfully"}
     except Exception as e:
         raise HTTPException(500, f"Seed failed: {str(e)}")
