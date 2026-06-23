@@ -4,6 +4,6 @@
   "installCommand": "cd frontend && npm install",
   "framework": "nextjs",
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://shotsaas-api.onrender.com"
+    "NEXT_PUBLIC_API_URL": "https://betano-7.onrender.com"
   }
 }
