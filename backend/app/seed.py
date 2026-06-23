@@ -15,7 +15,7 @@ from app.models.league import League
 from app.models.team import Team
 from app.models.player import Player
 from app.models.match import Match, MatchStatus
-from app.models.player_match_stats import PlayerMatchStats
+from app.models.player_match_stats import PlayerMatchStatss
 from app.models.expected_lineup import ExpectedLineup
 from app.models.odds import Odds
 from app.models.player_form import PlayerForm
@@ -188,7 +188,7 @@ async def seed_database(session):
                         session.add(lineup)
                         stats = generate_stats(3.5, 1.8, 0.75, n_games=10)
                         for s in stats:
-                            pms = PlayerMatchStat(player_id=player.id, match_id=match.id,
+                            pms = PlayerMatchStats(player_id=player.id, match_id=match.id,
                                                 minutes_played=s["minutes_played"],
                                                 total_shots=s["total_shots"],
                                                 shots_on_target=s["shots_on_target"],
@@ -331,7 +331,7 @@ async def seed():
                             session.add(past_match)
                             await session.flush()
 
-                            stat = PlayerMatchStats(
+                            stat = PlayerMatchStatss(
                                 player_id=player_id,
                                 match_id=past_match.id,
                                 minutes_played=s["minutes_played"],
