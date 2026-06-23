@@ -20,6 +20,7 @@ from app.tasks.refresh import (
     calculate_all_probabilities,
     detect_value_bets,
 )
+from app.seed import seed_database
 
 router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
 
@@ -79,6 +80,15 @@ async def get_admin_dashboard(db: AsyncSession = Depends(get_db)) -> dict:
         ],
     }
 
+
+@router.post("/seed")
+async def run_seed(db: AsyncSession = Depends(get_db)):
+    """Populate database with mock data for testing."""
+    try:
+        await seed_database(db)
+        return {"message": "Database seeded successfully"}
+    except Exception as e:
+        raise HTTPException(500, f"Seed failed: {str(e)}")
 
 @router.post("/refresh")
 async def force_refresh(
