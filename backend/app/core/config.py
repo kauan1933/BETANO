@@ -6,8 +6,9 @@ class Settings(BaseSettings):
     APP_NAME: str = "ShotSaaS"
     DEBUG: bool = False
 
-    DATABASE_URL: str = "sqlite+aiosqlite:///./shotsaas.db"
-    DATABASE_URL_SYNC: str = "sqlite:///./shotsaas.db"
+    # DB — uses env vars from Render when deployed, fallback to SQLite for local
+    DATABASE_URL: Optional[str] = None
+    DATABASE_URL_SYNC: Optional[str] = None
 
     REDIS_URL: str = "redis://localhost:6379/0"
 
@@ -33,6 +34,14 @@ class Settings(BaseSettings):
     # Refresh intervals (seconds)
     MATCH_REFRESH_INTERVAL: int = 300  # 5 min
     ODDS_REFRESH_INTERVAL: int = 60   # 1 min
+
+    @property
+    def db_url(self) -> str:
+        return self.DATABASE_URL or "sqlite+aiosqlite:///./shotsaas.db"
+
+    @property
+    def db_url_sync(self) -> str:
+        return self.DATABASE_URL_SYNC or "sqlite:///./shotsaas.db"
 
     class Config:
         env_file = ".env"

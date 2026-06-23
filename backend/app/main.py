@@ -35,23 +35,48 @@ async def lifespan(app: FastAPI):
         await conn.run_sync(Base.metadata.create_all)
     logger.info("Database tables created/verified.")
 
-    # Seed database if empty
+    # Check if we have real API key
+    has_real_api = bool(settings.API_FOOTBALL_KEY and len(settings.API_FOOTBALL_KEY) > 10)
+
     async with async_session_factory() as session:
         from sqlalchemy import select
         from app.models.league import League
         result = await session.execute(select(League).limit(1))
-        if not result.scalar_one_or_none():
-            logger.info("Database empty. Running seed...")
-            await seed_database()
-            logger.info("Database seeded with mock data.")
+        db_has_data = result.scalar_one_or_none() is not None
+
+        if not db_has_data:
+            if has_real_api:
+                logger.info("API-Football key found. Will fetch real data on first refresh.")
+                from app.services.data_fetcher import DataFetcher
+                fetcher = DataFetcher()
+                fixtures = await fetcher.get_today_fixtures()
+                if fixtures:
+                    logger.info(f"Found {len(fixtures)} real fixtures. Running full refresh...")
+                    from app.tasks.refresh import (
+                        refresh_today_matches, refresh_player_stats,
+                        refresh_odds, calculate_all_probabilities, detect_value_bets,
+                    )
+                    await refresh_today_matches()
+                    await refresh_player_stats()
+                    await refresh_odds()
+                    await calculate_all_probabilities()
+                    await detect_value_bets()
+                    logger.info("Real data refresh complete.")
+                else:
+                    logger.info("No real fixtures found. Running seed...")
+                    await seed_database()
+            else:
+                logger.info("No API key. Running seed with mock data...")
+                await seed_database()
+            logger.info("Database initialized.")
         else:
-            logger.info("Database already contains data. Skipping seed.")
+            logger.info("Database already contains data. Skipping initialization.")
 
     # Initialize Redis
     await init_redis()
     logger.info("Redis initialized.")
 
-    # Start background scheduler
+    # Start background scheduler (fetches real data every 15 min)
     await start_scheduler()
     logger.info("Background scheduler started.")
 
