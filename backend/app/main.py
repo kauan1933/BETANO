@@ -16,6 +16,7 @@ from app.core.redis import init_redis, close_redis
 from app.models.base import Base
 from app.api import players, matches, value_bets, admin
 from app.tasks.scheduler import start_scheduler, stop_scheduler
+from app.seed import seed_database
 
 logging.basicConfig(
     level=logging.INFO,
@@ -33,6 +34,18 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     logger.info("Database tables created/verified.")
+
+    # Seed database if empty
+    async with async_session_factory() as session:
+        from sqlalchemy import select
+        from app.models.league import League
+        result = await session.execute(select(League).limit(1))
+        if not result.scalar_one_or_none():
+            logger.info("Database empty. Running seed...")
+            await seed_database()
+            logger.info("Database seeded with mock data.")
+        else:
+            logger.info("Database already contains data. Skipping seed.")
 
     # Initialize Redis
     await init_redis()
