@@ -25,7 +25,10 @@ export default function Dashboard() {
         setMatches(m);
         setTopBets(v);
       })
-      .catch(console.error)
+      .catch((err) => {
+        console.error("Dashboard error:", err);
+        document.body.innerHTML += `<div style="position:fixed;bottom:0;left:0;right:0;background:red;color:white;padding:10px;z-index:9999;">API Error: ${err.message}</div>`;
+      })
       .finally(() => setLoading(false));
   }, []);
 
