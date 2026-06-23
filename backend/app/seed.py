@@ -18,6 +18,7 @@ from app.models.match import Match, MatchStatus
 from app.models.player_match_stats import PlayerMatchStats
 from app.models.expected_lineup import ExpectedLineup
 from app.models.odds import Odds
+from app.models.value_bet import ValueBet
 from app.models.player_form import PlayerForm
 
 LEAGUES_DATA = [
@@ -126,9 +127,11 @@ def generate_stats(base_shots: float, base_sot: float, consistency: float, n_gam
 
 async def seed_database(session):
     """Seed using an existing session (called from API endpoint)."""
-    existing = await session.execute(select(League).limit(1))
-    if existing.scalar_one_or_none():
-        return
+    # Clear existing data
+    for table in [PlayerMatchStats, ExpectedLineup, Odds, ValueBet, PlayerForm, Match, Player, Team, League]:
+        await session.execute(table.__table__.delete())
+    await session.commit()
+    print("Cleared existing data.")
 
     league_map = {}
     team_map = {}
