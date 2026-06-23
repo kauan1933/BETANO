@@ -158,7 +158,7 @@ async def seed_database(session):
             await session.flush()
             player_map[(team_name, player.name)] = player
             player_counts["Shooter"] += 1
-        for template in MIDFIELDER_TEMPLATES[:3]:
+        for template in MID_TEMPLATES[:3]:
             player = Player(name=template["name"], team_id=team.id,
                           position="Midfielder", nationality="Various")
             session.add(player)
