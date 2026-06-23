@@ -13,6 +13,7 @@ from app.models.value_bet import ValueBet, BetStatus
 from app.models.match import Match, MatchStatus
 from app.models.player import Player
 from app.models.player_form import PlayerForm
+from app.models.league import League
 from app.tasks.refresh import (
     refresh_today_matches,
     refresh_player_stats,
@@ -76,9 +77,11 @@ async def get_admin_dashboard(db: AsyncSession = Depends(get_db)) -> dict:
         "average_ev": round(float(avg_ev.scalar() or 0), 4),
         "last_refresh": last_refresh,
         "tracked_leagues": [
-            "Premier League", "La Liga", "Serie A", "Bundesliga",
-            "Ligue 1", "Brasileirão", "Argentine League", "MLS",
-            "Eredivisie", "Primeira Liga",
+            row[0] for row in (
+                await db.execute(
+                    select(League.name).where(League.is_active == True).order_by(League.name)
+                )
+            ).all()
         ],
     }
 

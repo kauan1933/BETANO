@@ -22,11 +22,25 @@ from app.models.value_bet import ValueBet
 from app.models.player_form import PlayerForm
 
 LEAGUES_DATA = [
-    {"name": "Premier League", "country": "England", "api_id": "39"},
-    {"name": "La Liga", "country": "Spain", "api_id": "140"},
-    {"name": "Serie A", "country": "Italy", "api_id": "135"},
-    {"name": "Bundesliga", "country": "Germany", "api_id": "78"},
-    {"name": "Brasileirão", "country": "Brazil", "api_id": "71"},
+    {"name": "Premier League", "country": "England", "api_id": 39},
+    {"name": "La Liga", "country": "Spain", "api_id": 140},
+    {"name": "Serie A", "country": "Italy", "api_id": 135},
+    {"name": "Bundesliga", "country": "Germany", "api_id": 78},
+    {"name": "Ligue 1", "country": "France", "api_id": 61},
+    {"name": "Brasileirão", "country": "Brazil", "api_id": 71},
+    {"name": "Argentine League", "country": "Argentina", "api_id": 128},
+    {"name": "MLS", "country": "USA", "api_id": 253},
+    {"name": "Eredivisie", "country": "Netherlands", "api_id": 88},
+    {"name": "Primeira Liga", "country": "Portugal", "api_id": 94},
+    {"name": "World Cup", "country": "International", "api_id": 1},
+    {"name": "Champions League", "country": "Europe", "api_id": 2},
+    {"name": "Europa League", "country": "Europe", "api_id": 3},
+    {"name": "Copa America", "country": "South America", "api_id": 9},
+    {"name": "Copa do Brasil", "country": "Brazil", "api_id": 73},
+    {"name": "Série B", "country": "Brazil", "api_id": 72},
+    {"name": "Championship", "country": "England", "api_id": 40},
+    {"name": "Liga MX", "country": "Mexico", "api_id": 262},
+    {"name": "J-League", "country": "Japan", "api_id": 98},
 ]
 
 TEAMS_DATA = {
@@ -57,15 +71,87 @@ TEAMS_DATA = {
         ("Botafogo", "BOT"), ("Fluminense", "FLU"), ("Cruzeiro", "CRU"),
         ("Internacional", "INT"),
     ],
+    "Ligue 1": [
+        ("Paris SG", "PSG"), ("Marseille", "MAR"), ("Monaco", "MON"),
+        ("Lyon", "LYO"), ("Lille", "LIL"), ("Nice", "NIC"),
+        ("Rennes", "REN"), ("Lens", "LEN"), ("Strasbourg", "STR"),
+        ("Toulouse", "TOU"),
+    ],
+    "Argentine League": [
+        ("River Plate", "RIV"), ("Boca Juniors", "BOC"), ("Independiente", "IND"),
+        ("Racing Club", "RAC"), ("San Lorenzo", "SLO"), ("Vélez Sarsfield", "VEL"),
+        ("Estudiantes", "EST"), ("Rosario Central", "RCA"), ("Talleres", "TAL"),
+        ("Unión", "UNI"),
+    ],
+    "MLS": [
+        ("Inter Miami", "MIA"), ("LAFC", "LAF"), ("LA Galaxy", "LAG"),
+        ("Atlanta United", "ATL"), ("NYCFC", "NYC"), ("Seattle Sounders", "SEA"),
+        ("Columbus Crew", "CLB"), ("Philadelphia Union", "PHI"), ("FC Dallas", "DAL"),
+        ("Portland Timbers", "POR"),
+    ],
+    "Eredivisie": [
+        ("Ajax", "AJA"), ("PSV", "PSV"), ("Feyenoord", "FEY"),
+        ("Twente", "TWE"), ("AZ Alkmaar", "AZ"), ("Utrecht", "UTR"),
+        ("Sparta Rotterdam", "SPA"), ("NEC", "NEC"), ("Heerenveen", "HEE"),
+        ("Go Ahead Eagles", "GAE"),
+    ],
+    "Primeira Liga": [
+        ("Benfica", "BEN"), ("Porto", "POR"), ("Sporting CP", "SPO"),
+        ("Braga", "BRA"), ("Vitória Guimarães", "GUI"), ("Famalicão", "FAM"),
+        ("Casa Pia", "CAS"), ("Moreirense", "MOR"), ("Arouca", "ARO"),
+        ("Rio Ave", "RIO"),
+    ],
     "Champions League": [
         ("Real Madrid", "RMA"), ("Manchester City", "MCI"), ("Bayern München", "BAY"),
         ("Paris SG", "PSG"), ("Barcelona", "FCB"), ("Arsenal", "ARS"),
         ("Inter Milan", "INT"), ("Borussia Dortmund", "BVB"),
     ],
+    "Europa League": [
+        ("Manchester United", "MUN"), ("Tottenham", "TOT"), ("Roma", "ROM"),
+        ("Lazio", "LAZ"), ("Atalanta", "ATA"), ("Lyon", "LYO"),
+        ("Marseille", "MAR"), ("Porto", "POR"), ("Ajax", "AJA"),
+        ("Fenerbahçe", "FEN"),
+    ],
     "World Cup": [
         ("Brasil", "BRA"), ("Argentina", "ARG"), ("França", "FRA"),
         ("Inglaterra", "ENG"), ("Espanha", "ESP"), ("Alemanha", "ALE"),
         ("Portugal", "POR"), ("Holanda", "HOL"),
+    ],
+    "Copa America": [
+        ("Brasil", "BRA"), ("Argentina", "ARG"), ("Uruguai", "URU"),
+        ("Colômbia", "COL"), ("Equador", "EQU"), ("Peru", "PER"),
+        ("Chile", "CHI"), ("Paraguai", "PAR"), ("Venezuela", "VEN"),
+        ("Bolívia", "BOL"),
+    ],
+    "Copa do Brasil": [
+        ("Flamengo", "FLA"), ("Palmeiras", "PAL"), ("São Paulo", "SAO"),
+        ("Corinthians", "COR"), ("Grêmio", "GRE"), ("Atlético MG", "CAM"),
+        ("Cruzeiro", "CRU"), ("Botafogo", "BOT"), ("Fluminense", "FLU"),
+        ("Internacional", "INT"),
+    ],
+    "Série B": [
+        ("Santos", "SAN"), ("Sport Recife", "SPO"), ("Novorizontino", "NOV"),
+        ("Mirassol", "MIR"), ("Vila Nova", "VIL"), ("Ceará", "CEA"),
+        ("Goiás", "GOI"), ("Amazonas", "AMA"), ("Coritiba", "CBT"),
+        ("Atlético GO", "ACG"),
+    ],
+    "Championship": [
+        ("Leeds United", "LEE"), ("Leicester City", "LEI"), ("Ipswich Town", "IPS"),
+        ("Southampton", "SOU"), ("West Brom", "WBA"), ("Norwich City", "NOR"),
+        ("Coventry City", "COV"), ("Watford", "WAT"), ("Middlesbrough", "MID"),
+        ("Hull City", "HUL"),
+    ],
+    "Liga MX": [
+        ("América", "AME"), ("Chivas", "CHI"), ("Cruz Azul", "CRU"),
+        ("Monterrey", "MTY"), ("Tigres", "TIG"), ("Pumas", "PUM"),
+        ("Toluca", "TOL"), ("Pachuca", "PAC"), ("León", "LEO"),
+        ("Santos Laguna", "SAN"),
+    ],
+    "J-League": [
+        ("Vissel Kobe", "VIS"), ("Yokohama F. Marinos", "YFM"), ("Kawasaki Frontale", "KAW"),
+        ("Urawa Reds", "URA"), ("Nagoya Grampus", "NAG"), ("Sanfrecce Hiroshima", "SAN"),
+        ("Cerezo Osaka", "CER"), ("FC Tokyo", "FCT"), ("Kashiwa Reysol", "KAS"),
+        ("Avispa Fukuoka", "AVI"),
     ],
 }
 

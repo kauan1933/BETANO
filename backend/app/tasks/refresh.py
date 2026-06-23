@@ -36,6 +36,25 @@ fetcher = DataFetcher()
 async def refresh_today_matches():
     """Fetch today's matches and upsert leagues/teams/matches."""
     logger.info("Refreshing today's matches...")
+
+    # Ensure all target leagues exist in the DB even if they have no fixtures today
+    async with async_session_factory() as session:
+        for target in TARGET_LEAGUES:
+            existing = await session.execute(
+                select(League).where(League.external_id == str(target["api_id"]))
+            )
+            if not existing.scalar_one_or_none():
+                league = League(
+                    name=target["name"],
+                    country=target["country"],
+                    external_id=str(target["api_id"]),
+                    is_active=True,
+                )
+                session.add(league)
+                await session.flush()
+                logger.info(f"Auto-created league: {target['name']} (id={target['api_id']})")
+        await session.commit()
+
     fixtures = await fetcher.get_today_fixtures()
     if not fixtures:
         logger.info("No fixtures found for today.")
