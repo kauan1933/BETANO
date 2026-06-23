@@ -1,4 +1,4 @@
-const API_BASE = "https://betano-7.onrender.com";
+const API_BASE = "";
 
 async function fetchJSON<T>(endpoint: string): Promise<T> {
   const controller = new AbortController();
