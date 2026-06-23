@@ -1,11 +1,18 @@
 const API_BASE = "https://betano-7.onrender.com";
 
 async function fetchJSON<T>(endpoint: string): Promise<T> {
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    next: { revalidate: 60 },
-  });
-  if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`);
-  return res.json();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  try {
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      signal: controller.signal,
+      cache: "no-cache",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return res.json();
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export interface PlayerFormData {

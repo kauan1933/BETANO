@@ -14,7 +14,13 @@ class Settings(BaseSettings):
     API_FOOTBALL_KEY: Optional[str] = None
     FOOTBALL_DATA_KEY: Optional[str] = None
 
-    CORS_ORIGINS: list[str] = ["http://localhost:3000", "https://shotsaas.vercel.app"]
+    CORS_ORIGINS: list[str] = [
+        "http://localhost:3000",
+        "https://shotsaas.vercel.app",
+        "https://betano-j6rx.vercel.app",
+        "https://betano-mu.vercel.app",
+        "https://betano-6y7i.vercel.app",
+    ]
 
     # Probability model weights
     WEIGHT_LAST_5: float = 0.50
